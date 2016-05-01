@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{7176C67D-3913-4CCC-878B-5B56ADA7F727}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Pinterest.Sdk</RootNamespace>
+    <AssemblyName>pinterest.sdk</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="RestSharp">
+      <HintPath>..\packages\RestSharp.105.2.3\lib\net45\RestSharp.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="JsonSerializer.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Models\v1\User.cs" />
+    <Compile Include="Models\PaginatedResponse.cs" />
+    <Compile Include="Models\v1\Board.cs" />
+    <Compile Include="Models\v1\ImageData.cs" />
+    <Compile Include="Models\v1\UserCounters.cs" />
+    <Compile Include="Models\v1\Image.cs" />
+    <Compile Include="Models\v1\BoardCounters.cs" />
+    <Compile Include="Models\v1\Creator.cs" />
+    <Compile Include="Models\v1\Page.cs" />
+    <Compile Include="Models\v1\Pin.cs" />
+    <Compile Include="Models\v1\PinCounters.cs" />
+    <Compile Include="Models\v1\Media.cs" />
+    <Compile Include="Models\v1\Metadata.cs" />
+    <Compile Include="PinterestApi.cs" />
+    <Compile Include="OAuth2PinterestAuthenticator.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Models\" />
+    <Folder Include="Models\v1\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+</Project>
