@@ -14,6 +14,7 @@
 //    limitations under the License.
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using Pinterest.Sdk.Models;
 using Pinterest.Sdk.Models.v1;
@@ -25,8 +26,7 @@ namespace Pinterest.Sdk
     {
         const string BASE_URL = "https://api.pinterest.com/";
 
-        readonly string CLIENT_ID;
-        string accessToken;
+        private RestClient client;
 
         public ApiV1 v1 { get; }
 
@@ -37,21 +37,29 @@ namespace Pinterest.Sdk
         public PinterestApi ()
         {
             v1 = new ApiV1(this);
+
+            client = new RestClient();
+            client.BaseUrl = new Uri(BASE_URL);
+
+            if (ConfigurationManager.AppSettings["USE_STORED_TOKEN"].ToLower() == "true")
+            {
+                var accessToken = ConfigurationManager.AppSettings["ACCESS_TOKEN"];
+
+                if (!string.IsNullOrEmpty(accessToken))
+                    client.Authenticator = new OAuth2PinterestAuthenticator(accessToken);
+            }
         }
 
-        public PinterestApi (string clientId) : this()
+        public PinterestApi (string accessToken) : this()
         {
-            if (string.IsNullOrEmpty(clientId))
-                throw new ArgumentNullException(nameof(clientId));
+            if (string.IsNullOrEmpty(accessToken))
+                throw new ArgumentNullException(nameof(accessToken));
 
-            this.CLIENT_ID = clientId;
+            client.Authenticator = new OAuth2PinterestAuthenticator(accessToken);
         }
 
         internal T Execute<T> (RestRequest request) where T : new()
         {
-            var client = new RestClient();
-            client.BaseUrl = new Uri(BASE_URL);
-            client.Authenticator = new OAuth2PinterestAuthenticator(accessToken);
             var response = client.Execute<T>(request);
 
             if (response.ErrorException != null)
@@ -72,6 +80,90 @@ namespace Pinterest.Sdk
                                   .Value.ToString()); ;
 
             return response.Data;
+        }
+
+        public bool AuthenticateFirstStep (Uri redirectUri,
+                                           PermissionScope scope = PermissionScope.None,
+                                           string state = null)
+        {
+            if (redirectUri == null)
+                throw new ArgumentNullException(nameof(redirectUri));
+
+            if (ConfigurationManager.AppSettings["USE_STORED_TOKEN"].ToLower() == "true")
+                return false;
+
+            var clientId = ConfigurationManager.AppSettings["APP_ID"];
+
+            if (string.IsNullOrEmpty(clientId))
+                return false;
+
+            var request = new RestRequest();
+            request.Resource = "oauth/";
+            request.RootElement = "data";
+            request.Method = Method.GET;
+
+            request.AddParameter("response_type", "code", ParameterType.UrlSegment);
+            request.AddParameter("client_id", clientId, ParameterType.UrlSegment);
+            if (state != null)
+                request.AddParameter("scope", scope.GetDescription(), ParameterType.UrlSegment);
+            request.AddParameter("redirect_uri", redirectUri.ToString(), ParameterType.UrlSegment);
+
+            var response = client.Execute(request);
+
+            return response.ResponseStatus == ResponseStatus.Completed;
+        }
+
+        public bool AuthenticateSecondStep (string code)
+        {
+            if (code == null)
+                throw new ArgumentNullException(nameof(code));
+
+            if (ConfigurationManager.AppSettings["USE_STORED_TOKEN"].ToLower() == "true")
+                return false;
+
+            var clientId = ConfigurationManager.AppSettings["APP_ID"];
+
+            if (string.IsNullOrEmpty(clientId))
+                return false;
+
+            var clientSecret = ConfigurationManager.AppSettings["APP_SECRET"];
+
+            if (string.IsNullOrEmpty(clientSecret))
+                return false;
+
+            var request = new RestRequest();
+            request.Resource = "v1/oauth/token";
+            request.RootElement = "data";
+            request.Method = Method.GET;
+
+            request.AddParameter("grant_type", "authorization_code", ParameterType.UrlSegment);
+            request.AddParameter("client_id", clientId, ParameterType.UrlSegment);
+            request.AddParameter("client_secret", clientSecret, ParameterType.UrlSegment);
+            request.AddParameter("code", code, ParameterType.UrlSegment);
+
+            var response = client.Execute(request);
+
+            return response.ResponseStatus == ResponseStatus.Completed;
+        }
+
+        public bool AuthenticateFirstStep (string clientId, Uri redirectUri,
+                                           PermissionScope scope = PermissionScope.None,
+                                           string state = null)
+        {
+            var request = new RestRequest();
+            request.Resource = "oauth/";
+            request.RootElement = "data";
+            request.Method = Method.GET;
+
+            request.AddParameter("response_type", "code", ParameterType.UrlSegment);
+            request.AddParameter("client_id", clientId, ParameterType.UrlSegment);
+            if (state != null)
+                request.AddParameter("scope", scope.GetDescription(), ParameterType.UrlSegment);
+            request.AddParameter("redirect_uri", redirectUri.ToString(), ParameterType.UrlSegment);
+
+            var response = client.Execute(request);
+
+            return response.ResponseStatus == ResponseStatus.Completed;
         }
 
         public class ApiV1

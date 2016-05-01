@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "pinterest.sdk", "pinterest.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "pinterest.console", "pinterest.console\pinterest.console.csproj", "{4BE839B5-539D-46AB-9F01-C43DA72A8048}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTesting", "UnitTesting\UnitTesting.csproj", "{2F1046B9-E278-499F-9616-F95E63435B6D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -19,6 +21,10 @@ Global
 		{4BE839B5-539D-46AB-9F01-C43DA72A8048}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4BE839B5-539D-46AB-9F01-C43DA72A8048}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4BE839B5-539D-46AB-9F01-C43DA72A8048}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2F1046B9-E278-499F-9616-F95E63435B6D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F1046B9-E278-499F-9616-F95E63435B6D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F1046B9-E278-499F-9616-F95E63435B6D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F1046B9-E278-499F-9616-F95E63435B6D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		Policies = $0
@@ -46,6 +52,7 @@ Global
 		$3.NewLineForMembersInObjectInit = True
 		$3.NewLineForMembersInAnonymousTypes = True
 		$3.NewLineForClausesInQuery = True
+		$3.SpaceBeforeOpenSquareBracket = False
 		$0.TextStylePolicy = $4
 		$4.inheritsSet = VisualStudio
 		$4.inheritsScope = text/plain
