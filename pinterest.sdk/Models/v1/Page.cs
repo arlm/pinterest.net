@@ -13,12 +13,14 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
+using System;
+
 namespace Pinterest.Sdk.Models.v1
 {
     public class Page
     {
-        public object cursor { get; set; }
-        public object next { get; set; }
+        public string cursor { get; set; }
+        public Uri next { get; set; }
     }
 }
 

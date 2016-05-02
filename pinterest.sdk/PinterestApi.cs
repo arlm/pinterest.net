@@ -19,12 +19,14 @@ using System.Linq;
 using Pinterest.Sdk.Models;
 using Pinterest.Sdk.Models.v1;
 using RestSharp;
+using System.Text;
+using RestSharp.Extensions.MonoHttp;
 
 namespace Pinterest.Sdk
 {
     public class PinterestApi
     {
-        const string BASE_URL = "https://api.pinterest.com/";
+        private const string BASE_URL = "https://api.pinterest.com/";
 
         private RestClient client;
 
@@ -41,7 +43,7 @@ namespace Pinterest.Sdk
             client = new RestClient();
             client.BaseUrl = new Uri(BASE_URL);
 
-            if (ConfigurationManager.AppSettings["USE_STORED_TOKEN"].ToLower() == "true")
+            if (ConfigurationManager.AppSettings["USE_STORED_TOKEN"]?.ToLower() == "true")
             {
                 var accessToken = ConfigurationManager.AppSettings["ACCESS_TOKEN"];
 
@@ -56,6 +58,44 @@ namespace Pinterest.Sdk
                 throw new ArgumentNullException(nameof(accessToken));
 
             client.Authenticator = new OAuth2PinterestAuthenticator(accessToken);
+        }
+
+        internal string GetRequestString (Uri uri)
+        {
+            if (uri == null)
+                throw new ArgumentNullException(nameof(uri));
+
+            var endpoint = new Uri(BASE_URL);
+            var resource = new StringBuilder();
+
+            for (int index = 0; index < uri.Segments.Length; index++)
+            {
+                if (index >= endpoint.Segments.Length ||
+                    uri.Segments[index] != endpoint.Segments[index])
+                {
+                    resource.Append(uri.Segments[index]);
+                }
+            }
+
+            return resource.ToString();
+        }
+
+        internal RestRequest GetRequest (Uri uri)
+        {
+            if (uri == null)
+                throw new ArgumentNullException(nameof(uri));
+
+            var request = new RestRequest();
+
+            request.Resource = GetRequestString(uri);
+
+            var queries = HttpUtility.ParseQueryString(uri.Query);
+            foreach (var key in queries.AllKeys)
+            {
+                request.AddParameter(key, queries[key], ParameterType.QueryString);
+            }
+
+            return request;
         }
 
         internal T Execute<T> (RestRequest request) where T : new()
@@ -222,9 +262,15 @@ namespace Pinterest.Sdk
             {
                 var request = new RestRequest();
                 request.Resource = "v1/pins/{pinId}/";
-                request.RootElement = "data";
 
                 request.AddParameter("boardId", boardId, ParameterType.UrlSegment);
+
+                return api.Execute<PaginatedResponse<Pin>>(request);
+            }
+
+            public PaginatedResponse<Pin> GetNextPinsFromBoardPage (Uri uri)
+            {
+                var request = api.GetRequest(uri);
 
                 return api.Execute<PaginatedResponse<Pin>>(request);
             }

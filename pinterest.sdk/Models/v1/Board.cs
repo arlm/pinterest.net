@@ -28,7 +28,7 @@ namespace Pinterest.Sdk.Models.v1
         public BoardCounters counts { get; set; }
         public Image image { get; set; }
         public string privacy { get; set; }
-        public object reason { get; set; }
+        public string reason { get; set; }
     }
 }
 

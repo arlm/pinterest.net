@@ -21,6 +21,8 @@ namespace Pinterest.Sdk.Models
     {
         public List<T> data { get; set; }
         public v1.Page page { get; set; }
+
+
     }
 }
 
